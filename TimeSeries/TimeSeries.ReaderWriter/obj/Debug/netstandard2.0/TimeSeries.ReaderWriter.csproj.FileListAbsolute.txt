@@ -1,0 +1,9 @@
+C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\bin\Debug\netstandard2.0\TimeSeries.ReaderWriter.deps.json
+C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\bin\Debug\netstandard2.0\TimeSeries.ReaderWriter.dll
+C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\bin\Debug\netstandard2.0\TimeSeries.ReaderWriter.pdb
+C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\obj\Debug\netstandard2.0\TimeSeries.ReaderWriter.csprojAssemblyReference.cache
+C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\obj\Debug\netstandard2.0\TimeSeries.ReaderWriter.AssemblyInfoInputs.cache
+C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\obj\Debug\netstandard2.0\TimeSeries.ReaderWriter.AssemblyInfo.cs
+C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\obj\Debug\netstandard2.0\TimeSeries.ReaderWriter.csproj.CoreCompileInputs.cache
+C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\obj\Debug\netstandard2.0\TimeSeries.ReaderWriter.dll
+C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\obj\Debug\netstandard2.0\TimeSeries.ReaderWriter.pdb
