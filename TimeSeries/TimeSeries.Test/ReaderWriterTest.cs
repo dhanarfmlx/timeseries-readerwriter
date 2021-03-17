@@ -9,7 +9,7 @@ namespace TimeSeries.Test
     public class Tests
     {
         ReaderWriterServices rw = new ReaderWriterServices();
-        public string FilesContainer = @"C:\Users\DELL\yusuf-frmltrx\timeseries-readerwriter\TimeSeries\TimeSeries.ReaderWriter\Data\";
+        public string FilesContainer = TestContext.CurrentContext.TestDirectory;
 
         [SetUp]
         public void Setup()
