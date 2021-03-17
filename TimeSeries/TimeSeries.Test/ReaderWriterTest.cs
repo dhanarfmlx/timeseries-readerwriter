@@ -9,7 +9,7 @@ namespace TimeSeries.Test
     public class Tests
     {
         ReaderWriterServices rw = new ReaderWriterServices();
-        public string FilesContainer = @$"{Path.GetDirectoryName(Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory))}\Data\"; 
+        public string FilesContainer = @$"{Path.GetDirectoryName(Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory))}\"; 
 
         [SetUp]
         public void Setup()
