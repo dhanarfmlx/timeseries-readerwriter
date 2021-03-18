@@ -9,7 +9,7 @@ namespace TimeSeries.Test
     public class Tests
     {
         ReaderWriterServices rw = new ReaderWriterServices();
-        public string FilesContainer = TestContext.CurrentContext.TestDirectory;
+        public string FilesContainer = @$"{Path.GetDirectoryName(Path.GetDirectoryName(TestContext.CurrentContext.TestDirectory))}\"; 
 
         [SetUp]
         public void Setup()
@@ -19,7 +19,7 @@ namespace TimeSeries.Test
                 rw.deleteAllFiles(FilesContainer);
             }
         }
-
+       
         /*
         [TEST CASES]
         > Test1 : want to write 1 day. in the middle of writing 1st day=> read 1st day
