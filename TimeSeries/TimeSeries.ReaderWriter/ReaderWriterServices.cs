@@ -4,59 +4,40 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace TimeSeries.ReaderWriter
 {
     public class ReaderWriterServices
     {
-        public List<string> Write(string file, List<string> sensorDatas)
+        public void Write(string file, string sensorData)
         {
-            using (StreamWriter sw = new StreamWriter(file))
+            using (StreamWriter sw = new StreamWriter(file,true))
             {
-                foreach (var sensorData in sensorDatas)
-                {
-                    sw.WriteLine(sensorData);
-                }
+                sw.WriteLine($"{sensorData}");
             }
-            sensorDatas.Clear();
-            return sensorDatas;
         }
 
-        public string Read(DateTime dt, int step, string FileContainer)
+        public async Task<string> ReadAsync(DateTime dt, int step, string FileContainer)
         {
-
-            StringBuilder sB = new StringBuilder();
             string date = dt.ToString("yyyy-MM-dd");
             string file = $@"{FileContainer}{date}.txt";
+            byte[] result;
 
             if (File.Exists(file))
             {
-                if (new FileInfo(file).Length == 0)
+                using (FileStream SourceStream = File.Open(file, FileMode.Open))
                 {
-                    throw new Exception("File is stil written");
-                }
-                else
-                {
-                    using (StreamReader sr = new StreamReader(file))
-                    {
-                        int i = 0;
-                        string line;
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            if (i % step == 0)
-                            {
-                                sB.Append(line + Environment.NewLine);
-                            }
-                            i++;
-                        }
-                    }
+                    result = new byte[SourceStream.Length];
+                    await SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
                 }
             }
             else
             {
                 throw new Exception("File Not Found");
             }
-            return sB.ToString();
+
+            return Encoding.ASCII.GetString(result);
         }
 
         public void deleteAllFiles(string FilesContainer)
@@ -69,7 +50,6 @@ namespace TimeSeries.ReaderWriter
 
         public bool deleteWeekly(string FilesContainer)
         {
-            //if there are 8 files ( 7 written files and 1 new file ) => delete 7 written files 
             List<string> listOfFiles = new List<string>();
             listOfFiles = Directory.GetFiles($@"{FilesContainer}", "*.txt", SearchOption.AllDirectories).ToList();
 
@@ -89,6 +69,7 @@ namespace TimeSeries.ReaderWriter
         {
             return Directory.GetFiles($@"{FilesContainer}", "*.txt", SearchOption.AllDirectories).ToList().Count;
         }
+
         public string CreateFile(DateTime dt, string FilesContainer)
         {
             string date = dt.ToString("yyyy-MM-dd");
@@ -98,6 +79,7 @@ namespace TimeSeries.ReaderWriter
             {
                 using (File.Create(file)) { }
             }
+
             return file;
         }
 
@@ -114,7 +96,13 @@ namespace TimeSeries.ReaderWriter
                 sd.sensorData[j] = random.NextDouble();
             }
 
-            string jsonFile = JsonConvert.SerializeObject(sd);
+            string jsonFile = JsonConvert.SerializeObject(sd)+",";
+
+            if (dt.Hour==23 && dt.Minute==59 && dt.Second==59)
+            {
+                jsonFile=jsonFile.TrimEnd(','); 
+            }
+
             return jsonFile;
         }
     }
