@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -93,7 +92,7 @@ namespace TimeSeries.Test
                     break;
                 }
             }
-            Assert.AreEqual(result.Length > 12817000, true);
+            Assert.AreEqual(result.Length > 12500000, true);
             Assert.AreEqual(rw.CountFiles(FilesContainer), 2);
             Assert.AreEqual(rw.deleteWeekly(FilesContainer), false);
         }
