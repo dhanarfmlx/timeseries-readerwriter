@@ -10,53 +10,34 @@ namespace TimeSeries.ReaderWriter
 {
     public class ReaderWriterServices
     {
-
-        public FileStream createWriterStream(string file)
+        public void Write(string file, string sensorData)
         {
-            return File.Open(file, FileMode.Append, FileAccess.Write, FileShare.Read); 
+            using (StreamWriter sw = new StreamWriter(file,true))
+            {
+                sw.WriteLine($"{sensorData}");
+            }
         }
 
-        public FileStream createReaderStream(DateTime dt,string FilesContainer)
+        public async Task<string> ReadAsync(DateTime dt, int step, string FileContainer)
         {
             string date = dt.ToString("yyyy-MM-dd");
-            string file = $@"{FilesContainer + date}.txt";
+            string file = $@"{FileContainer}{date}.txt";
+            byte[] result;
 
-            if (!File.Exists(file))
+            if (File.Exists(file))
             {
-                throw new Exception("File Not Found");
+                using (FileStream SourceStream = File.Open(file, FileMode.Open))
+                {
+                    result = new byte[SourceStream.Length];
+                    await SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
+                }
             }
             else
             {
-                return File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Write);
+                throw new Exception("File Not Found");
             }
-            
-        }
-        
-        public void Write(FileStream SourceStream,string sensorData)
-        {
-            byte[] result = new UTF8Encoding(true).GetBytes(sensorData + "\r\n");
-            SourceStream.Write(result, 0, result.Length);
-        }
 
-        public string Read(FileStream SourceStream, int step)
-        {
-            StringBuilder sB = new StringBuilder();
-            //if not using streamreader (read all using FileStream.Read))=> can't do step reading 
-            //compare to FileStream.Read => execution time is similar 
-            using (StreamReader sr = new StreamReader(SourceStream)) 
-            {
-                int i = 0;
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    if (i % step == 0)
-                    {
-                        sB.Append(line + Environment.NewLine);
-                    }
-                    i++;
-                }
-            }
-            return sB.ToString();
+            return Encoding.ASCII.GetString(result);
         }
 
         public void deleteAllFiles(string FilesContainer)
@@ -107,13 +88,12 @@ namespace TimeSeries.ReaderWriter
             SensorData sd = new SensorData();
             sd.datetime = dt.ToString("yyyy-MM-dd HH:mm:ss");
 
-
             Random random = new Random();
             sd.sensorData = new double[5];
 
             for (int j = 0; j < 5; j++)
             {
-                sd.sensorData[j] = Math.Round(random.NextDouble(),3);
+                sd.sensorData[j] = random.NextDouble();
             }
 
             string jsonFile = JsonConvert.SerializeObject(sd)+",";

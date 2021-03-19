@@ -10,15 +10,75 @@ namespace TimeSeries.ReaderWriter
 {
     public class ReaderWriterServices
     {
-        public void Write(string file, string sensorData)
+
+        public FileStream createWriterStream(string file)
         {
-            using (StreamWriter sw = new StreamWriter(file,true))
+            return File.Open(file, FileMode.Append, FileAccess.Write, FileShare.Read); 
+        }
+
+        public FileStream createReaderStream(DateTime dt,string FilesContainer)
+        {
+            string date = dt.ToString("yyyy-MM-dd");
+            string file = $@"{FilesContainer + date}.txt";
+
+            if (!File.Exists(file))
             {
-                sw.WriteLine($"{sensorData}");
+                throw new Exception("File Not Found");
+            }
+            else
+            {
+                return File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Write);
+            }
+            
+        }
+        
+        public void Write(FileStream SourceStream,string sensorData)
+        {
+            byte[] result = new UTF8Encoding(true).GetBytes(sensorData + "\r\n");
+            SourceStream.Write(result, 0, result.Length);
+        }
+
+        public string Read(FileStream SourceStream)
+        {
+            List<byte[]> ck = new List<byte[]>();
+            byte[] result;
+
+            result = new byte[SourceStream.Length];
+            SourceStream.Read(result, 0, (int)SourceStream.Length);
+
+            return Encoding.ASCII.GetString(result);
+        }
+
+        public string Readz(FileStream SourceStream, int step)
+        {
+            StringBuilder sB = new StringBuilder(); 
+            using (StreamReader sr = new StreamReader(SourceStream))
+            {
+                int i = 0;
+                string line;
+                while ((line = sr.ReadLine()) != null)
+                {
+                    if (i % step == 0)
+                    {
+                        sB.Append(line + Environment.NewLine);
+                    }
+                    i++;
+                }
+            }
+            return sB.ToString();
+        }
+
+
+        public void Write2(string file, string sensorData)
+        {
+            using (FileStream SourceStream = File.Open(file, FileMode.Append,FileAccess.Write,FileShare.Read))
+            {
+                byte[] result = new UTF8Encoding(true).GetBytes(sensorData+"\r\n");
+                SourceStream.Write(result, 0, result.Length);
             }
         }
 
-        public async Task<string> ReadAsync(DateTime dt, int step, string FileContainer)
+        public string Read2(DateTime dt, int step, string FileContainer)
         {
             string date = dt.ToString("yyyy-MM-dd");
             string file = $@"{FileContainer}{date}.txt";
@@ -26,10 +86,10 @@ namespace TimeSeries.ReaderWriter
 
             if (File.Exists(file))
             {
-                using (FileStream SourceStream = File.Open(file, FileMode.Open))
+                using (FileStream SourceStream = File.Open(file, FileMode.Open, FileAccess.Read,FileShare.Write))
                 {
                     result = new byte[SourceStream.Length];
-                    await SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
+                    SourceStream.Read(result, 0, (int)SourceStream.Length);
                 }
             }
             else
@@ -88,12 +148,13 @@ namespace TimeSeries.ReaderWriter
             SensorData sd = new SensorData();
             sd.datetime = dt.ToString("yyyy-MM-dd HH:mm:ss");
 
+
             Random random = new Random();
             sd.sensorData = new double[5];
 
             for (int j = 0; j < 5; j++)
             {
-                sd.sensorData[j] = random.NextDouble();
+                sd.sensorData[j] = Math.Round(random.NextDouble(),3);
             }
 
             string jsonFile = JsonConvert.SerializeObject(sd)+",";
