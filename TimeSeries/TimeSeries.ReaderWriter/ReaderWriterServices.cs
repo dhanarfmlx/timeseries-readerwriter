@@ -30,7 +30,7 @@ namespace TimeSeries.ReaderWriter
                 using (FileStream SourceStream = File.Open(file, FileMode.Open, FileAccess.Read,FileShare.Write))
                 {
                     result = new byte[SourceStream.Length];
-                    SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
+                    SourceStream.Read(result, 0, (int)SourceStream.Length);
                 }
             }
             else
