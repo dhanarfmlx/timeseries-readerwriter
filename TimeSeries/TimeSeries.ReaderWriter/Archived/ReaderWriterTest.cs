@@ -35,13 +35,13 @@ namespace TimeSeries.Test
 
         [Test]
         [TestCase(5)]
-        public void Test1(int step)
+        public async Task Test1(int step)
         {
             DateTime clockRun = new DateTime(2021, 3, 15, 23, 59, 0);
             string file = rw.CreateFile(clockRun, FilesContainer);
             string result=""; 
 
-            while (clockRun.Day!=17)
+            while (clockRun.Day!=16)
             {
                 rw.Write(file, rw.InputSensorData(clockRun));
                 clockRun=clockRun.AddSeconds(1);
@@ -53,7 +53,7 @@ namespace TimeSeries.Test
 
                 if (clockRun.Equals(new DateTime(2021,3,16,12,0,0)))
                 {
-                    result = rw.Read(new DateTime(2021, 3, 16), step, FilesContainer);
+                    result = await rw.ReadAsync(new DateTime(2021, 3, 16), step, FilesContainer);
                 }
             }
             Assert.AreEqual(result.Length < 6500000, true);
@@ -64,13 +64,13 @@ namespace TimeSeries.Test
         [Test]
         public void Test2()
         {
-            var exception = Assert.Throws<System.Exception>(() =>  rw.Read(new DateTime(2022, 3, 17), 5, FilesContainer));
+            var exception = Assert.ThrowsAsync<System.Exception>(async() => await rw.ReadAsync(new DateTime(2022, 3, 17), 5, FilesContainer));
             Assert.AreEqual("File Not Found", exception.Message);
         }
 
         [Test]
         [TestCase(5)]
-        public void Test3(int step)
+        public async Task Test3(int step)
         {
             DateTime clockRun = new DateTime(2021, 3, 15, 0, 0, 0);
             string file = rw.CreateFile(clockRun, FilesContainer);
@@ -88,7 +88,7 @@ namespace TimeSeries.Test
 
                 if (clockRun.Equals(new DateTime(2021, 3, 16, 1, 0, 0)))
                 {
-                    result = rw.Read(new DateTime(2021, 3, 15), step, FilesContainer);
+                    result = await rw.ReadAsync(new DateTime(2021, 3, 15), step, FilesContainer);
                     break;
                 }
             }

@@ -12,14 +12,13 @@ namespace TimeSeries.ReaderWriter
     {
         public void Write(string file, string sensorData)
         {
-            using (FileStream SourceStream = File.Open(file, FileMode.Append,FileAccess.Write,FileShare.Read))
+            using (StreamWriter sw = new StreamWriter(file,true))
             {
-                byte[] result = new UTF8Encoding(true).GetBytes(sensorData+"\r\n");
-                SourceStream.Write(result, 0, result.Length);
+                sw.WriteLine($"{sensorData}");
             }
         }
 
-        public string Read(DateTime dt, int step, string FileContainer)
+        public async Task<string> ReadAsync(DateTime dt, int step, string FileContainer)
         {
             string date = dt.ToString("yyyy-MM-dd");
             string file = $@"{FileContainer}{date}.txt";
@@ -27,10 +26,10 @@ namespace TimeSeries.ReaderWriter
 
             if (File.Exists(file))
             {
-                using (FileStream SourceStream = File.Open(file, FileMode.Open, FileAccess.Read,FileShare.Write))
+                using (FileStream SourceStream = File.Open(file, FileMode.Open))
                 {
                     result = new byte[SourceStream.Length];
-                    SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
+                    await SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
                 }
             }
             else
