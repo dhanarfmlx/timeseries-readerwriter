@@ -10,6 +10,64 @@ namespace TimeSeries.ReaderWriter
 {
     public class ReaderWriterServices
     {
+        public string runSimulation(DateTime startDate, DateTime finishDate, DateTime whenReadFile, DateTime whichDateToRead, string FilesContainer,int step)
+        {
+            DateTime clockRun = startDate; 
+            string file = CreateFile(clockRun, FilesContainer);
+            string readResult = "";
+            bool exception = false;
+
+            FileStream writerStream = createWriterStream(file);
+            FileStream readerStream = null;
+
+            while (clockRun.Day != finishDate.Day)
+            {
+                Write(writerStream, InputSensorData(clockRun));
+                clockRun = clockRun.AddSeconds(1);
+
+                if (clockRun.Hour == 0 && clockRun.Minute == 0 && clockRun.Second == 0)
+                {
+                    writerStream.Close();
+
+                    file = CreateFile(clockRun, FilesContainer);
+                    writerStream = createWriterStream(file);
+
+                    deleteWeekly(FilesContainer);
+                }
+
+                if (clockRun.Equals(whenReadFile))
+                {
+                    if (clockRun.Day.Equals(whichDateToRead.Day))
+                    {
+                        writerStream.Flush();
+                    }
+
+                    try
+                    {
+                        readerStream = createReaderStream(whichDateToRead, FilesContainer);
+                    }
+                    catch (Exception ex)
+                    {
+                        exception = true;
+                        readResult = ex.Message; 
+                    }
+
+                    if (exception == false)
+                    {
+                        readResult = Read(readerStream, step);
+                    }
+                }
+            }
+
+            if (exception == false)
+            {
+                readerStream.Close();
+            }
+
+            writerStream.Close();
+
+            return readResult; 
+        }
 
         public FileStream createWriterStream(string file)
         {
@@ -41,8 +99,7 @@ namespace TimeSeries.ReaderWriter
         public string Read(FileStream SourceStream, int step)
         {
             StringBuilder sB = new StringBuilder();
-            //if not using streamreader (read all using FileStream.Read))=> can't do step reading 
-            //compare to FileStream.Read => execution time is similar 
+
             using (StreamReader sr = new StreamReader(SourceStream)) 
             {
                 int i = 0;
