@@ -36,84 +36,44 @@ namespace TimeSeries.Test
         [TestCase(1)]
         public void Test1(int step)
         {
-            DateTime clockRun = new DateTime(2021, 3, 15, 0, 0, 0);
-            string file = rw.CreateFile(clockRun, FilesContainer);
-            string readResult = "";
+            DateTime startDate = new DateTime(2021, 3, 15);
+            DateTime finishDate = new DateTime(2021, 3, 16);
+            DateTime whenReadFile = new DateTime(2021, 3, 15, 12, 0, 0); 
+            DateTime whichDateToRead = new DateTime(2021, 3, 15);
 
-            FileStream writerStream = rw.createWriterStream(file);
-            FileStream readerStream = null;
-
-            while (clockRun.Day!=16)
-            {
-                rw.Write(writerStream, rw.InputSensorData(clockRun));
-                clockRun = clockRun.AddSeconds(1);
-
-                if (clockRun.Equals(new DateTime(2021, 3, 15, 12, 0, 0)))
-                {
-                    writerStream.Close(); // if not closed, the read data will not complete in last line
-
-                    readerStream = rw.createReaderStream(new DateTime(2021, 3, 15), FilesContainer);
-                    readResult = rw.Read(readerStream,step);
-
-                    writerStream = rw.createWriterStream(file);
-                }
-            }
-            readerStream.Close();
-            writerStream.Close();
+            string readResult = rw.runSimulation(startDate, finishDate, whenReadFile, whichDateToRead,FilesContainer,step);
 
             Assert.AreEqual(readResult.Length < 4000000, true);
-            Assert.AreEqual(rw.CountFiles(FilesContainer), 1);
+            Assert.AreEqual(rw.CountFiles(FilesContainer), 2);
             Assert.AreEqual(rw.deleteWeekly(FilesContainer), false);
         }
         
         [Test]
-        public void Test2()
+        [TestCase(1)]
+        public void Test2(int step)
         {
-            try
-            {
-                using (rw.createReaderStream(new DateTime(2022, 3, 16), FilesContainer));
-            }
-            catch(Exception ex)
-            {
-                Assert.AreEqual("File Not Found", ex.Message);
-            }
+            DateTime startDate = new DateTime(2021, 3, 15);
+            DateTime finishDate = new DateTime(2021, 3, 16);
+            DateTime whenReadFile = new DateTime(2021, 3, 15, 12, 0, 0);
+            DateTime whichDateToRead = new DateTime(2022, 3, 15);
+
+            string readResult = rw.runSimulation(startDate, finishDate, whenReadFile, whichDateToRead, FilesContainer, step);
+
+            Assert.AreEqual("File Not Found", readResult);
+            Assert.AreEqual(rw.CountFiles(FilesContainer), 2);
+            Assert.AreEqual(rw.deleteWeekly(FilesContainer), false);
         }
 
         [Test]
         [TestCase(1)]
         public void Test3(int step)
         {
-            DateTime clockRun = new DateTime(2021, 3, 15, 0, 0, 0);
-            string file = rw.CreateFile(clockRun, FilesContainer);
-            string readResult = "";
+            DateTime startDate = new DateTime(2021, 3, 15);
+            DateTime finishDate = new DateTime(2021, 3, 19);
+            DateTime whenReadFile = new DateTime(2021, 3, 18);
+            DateTime whichDateToRead = new DateTime(2021, 3, 15);
 
-            FileStream writerStream = rw.createWriterStream(file);
-            FileStream readerStream = null;
-
-            while (clockRun.Day != 19)
-            {
-                rw.Write(writerStream, rw.InputSensorData(clockRun));
-                clockRun = clockRun.AddSeconds(1);
-
-                if (clockRun.Hour == 0 && clockRun.Minute == 0 && clockRun.Second == 0)
-                {
-                    writerStream.Close();
-                    file = rw.CreateFile(clockRun, FilesContainer);
-                    writerStream = rw.createWriterStream(file);
-                }
-
-                if (clockRun.Equals(new DateTime(2021, 3, 18, 12, 0, 0)))
-                {
-                    writerStream.Close();
-
-                    readerStream = rw.createReaderStream(new DateTime(2021, 3, 15), FilesContainer);
-                    readResult = rw.Read(readerStream,step);
-
-                    writerStream = rw.createWriterStream(file);
-                }
-            }
-            readerStream.Close();
-            writerStream.Close();
+            string readResult = rw.runSimulation(startDate, finishDate, whenReadFile, whichDateToRead, FilesContainer, step);
 
             Assert.AreEqual(readResult.Length > 7000000, true);
             Assert.AreEqual(rw.CountFiles(FilesContainer), 5);
@@ -121,21 +81,17 @@ namespace TimeSeries.Test
         }
 
         [Test]
-        public void Test4()
+        [TestCase(1)]
+        public void Test4(int step)
         {
-            DateTime clockRun = new DateTime(2021, 4, 18, 0, 0, 0);
-            rw.CreateFile(clockRun, FilesContainer);
+            DateTime startDate = new DateTime(2021, 3, 18);
+            DateTime finishDate = new DateTime(2021, 3, 26);
+            DateTime whenReadFile = new DateTime(2021, 3, 19);
+            DateTime whichDateToRead = new DateTime(2021, 3, 18);
 
-            while (clockRun.Day != 26)
-            {
-                clockRun = clockRun.AddSeconds(1);
+            string readResult = rw.runSimulation(startDate, finishDate, whenReadFile, whichDateToRead, FilesContainer, step);
 
-                if (clockRun.Hour == 0 && clockRun.Minute == 0 && clockRun.Second == 0)
-                {
-                    rw.CreateFile(clockRun, FilesContainer);
-                    rw.deleteWeekly(FilesContainer);
-                }
-            }
+            Assert.AreEqual(readResult.Length > 7000000, true);
             Assert.AreEqual(rw.CountFiles(FilesContainer), 2);
         }
     }
