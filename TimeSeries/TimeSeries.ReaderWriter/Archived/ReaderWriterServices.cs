@@ -38,12 +38,21 @@ namespace TimeSeries.ReaderWriter
             SourceStream.Write(result, 0, result.Length);
         }
 
-        public string Read(FileStream SourceStream, int step)
+        public string Read(FileStream SourceStream)
         {
-            StringBuilder sB = new StringBuilder();
-            //if not using streamreader (read all using FileStream.Read))=> can't do step reading 
-            //compare to FileStream.Read => execution time is similar 
-            using (StreamReader sr = new StreamReader(SourceStream)) 
+            List<byte[]> ck = new List<byte[]>();
+            byte[] result;
+
+            result = new byte[SourceStream.Length];
+            SourceStream.Read(result, 0, (int)SourceStream.Length);
+
+            return Encoding.ASCII.GetString(result);
+        }
+
+        public string Readz(FileStream SourceStream, int step)
+        {
+            StringBuilder sB = new StringBuilder(); 
+            using (StreamReader sr = new StreamReader(SourceStream))
             {
                 int i = 0;
                 string line;
@@ -57,6 +66,38 @@ namespace TimeSeries.ReaderWriter
                 }
             }
             return sB.ToString();
+        }
+
+
+        public void Write2(string file, string sensorData)
+        {
+            using (FileStream SourceStream = File.Open(file, FileMode.Append,FileAccess.Write,FileShare.Read))
+            {
+                byte[] result = new UTF8Encoding(true).GetBytes(sensorData+"\r\n");
+                SourceStream.Write(result, 0, result.Length);
+            }
+        }
+
+        public string Read2(DateTime dt, int step, string FileContainer)
+        {
+            string date = dt.ToString("yyyy-MM-dd");
+            string file = $@"{FileContainer}{date}.txt";
+            byte[] result;
+
+            if (File.Exists(file))
+            {
+                using (FileStream SourceStream = File.Open(file, FileMode.Open, FileAccess.Read,FileShare.Write))
+                {
+                    result = new byte[SourceStream.Length];
+                    SourceStream.Read(result, 0, (int)SourceStream.Length);
+                }
+            }
+            else
+            {
+                throw new Exception("File Not Found");
+            }
+
+            return Encoding.ASCII.GetString(result);
         }
 
         public void deleteAllFiles(string FilesContainer)
